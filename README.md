@@ -34,12 +34,128 @@ Publish the website in the given URL.
 ## PROGRAM :
 ```
 INCLUDE YOUR PROGRAM HERE
+
+
+bmicalculatorhtml
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BMI Calculator</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        form {
+            width: 300px;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 8px;
+            margin-left: 50%;
+            transform: translateX(-50%);
+        }
+        input { width: 100%; margin: 10px 0; padding: 8px; }
+        .result { margin-top: 20px; padding: 10px; background: #f1f1f1; }
+    </style>
+</head>
+
+<body>
+    <h2 align="center">BMI Calculator (Server-side in Django)</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        <label>Weight (kg)</label>
+        <input type="number" step="0.1" name="weight" required>
+
+        <label>Height (cm)</label>
+        <input type="number" step="0.1" name="height" required>
+
+        <button type="submit">Calculate BMI</button>
+        {% if bmi %}
+        <div class="result">
+            <strong>Your BMI:</strong> {{ bmi }}<br>
+            <strong>Category:</strong> {{ category }}
+        </div>
+        {% endif %}
+    </form>
+
+    
+</body>
+</html>
+
+
+
+views.py
+
+from django.shortcuts import render
+
+# Create your views here.
+def bmi_calculator(request):
+    bmi = None
+    category = None
+
+    if request.method == "POST":
+        weight = float(request.POST.get("weight"))
+        height = float(request.POST.get("height"))
+
+        # Convert height from cm to meters
+        height_m = height / 100
+
+        # BMI formula
+        bmi = weight / (height_m ** 2)
+        bmi = round(bmi, 2)
+
+        # Classification
+        if bmi < 18.5:
+            category = "Underweight"
+        elif 18.5 <= bmi < 24.9:
+            category = "Normal weight"
+        elif 25 <= bmi < 29.9:
+            category = "Overweight"
+        else:
+            category = "Obesity"
+
+    return render(request, "bmicalculatorApp.html", {
+        "bmi": bmi,
+        "category": category
+    })
+
+
+
+urls.py
+"""
+URL configuration for bmiproject project.
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/5.2/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+from django.contrib import admin
+from django.urls import path
+from bmi_app import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('bmi', views.bmi_calculator, name='bmicalculatorApp'),
+]
+
+
+
+
 ```
 
 ## SERVER SIDE PROCESSING:
+<img width="1920" height="1080" alt="Screenshot 2025-12-18 104255" src="https://github.com/user-attachments/assets/9d8a519a-ea46-4ec8-947f-d68c4ca3db6c" />
 
 
 ## HOMEPAGE:
+<img width="1920" height="1080" alt="Screenshot 2025-12-18 104308" src="https://github.com/user-attachments/assets/b057ad9e-9296-4ddd-a44d-c2d93d86ba31" />
 
 
 ## RESULT:
